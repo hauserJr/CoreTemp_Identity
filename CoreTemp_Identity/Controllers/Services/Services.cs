@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CoreTemp_Identity.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +11,7 @@ namespace CoreTemp_Identity.Controllers.Services
     {
         public interface IDBManage
         {
-            void UpdateData<TModel>(TModel model);
+            void CreateData<TModel>(TModel model);
         }
         public class DBm
         {
@@ -25,9 +27,16 @@ namespace CoreTemp_Identity.Controllers.Services
 
         public class DBAction : IDBManage
         {
-            public void UpdateData<TModel>(TModel model)
+            private readonly CoreContext db;
+            public DBAction(CoreContext _db)
             {
-                throw new NotImplementedException();
+                this.db = _db;
+            }
+            public void CreateData<TModel>(TModel model)
+            {
+                
+                db.UpdateRange(model);
+                db.SaveChanges();
             }
         }
     }

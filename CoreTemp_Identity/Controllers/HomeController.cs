@@ -21,7 +21,10 @@ namespace CoreTemp_Identity.Controllers
         {
             this.db = _db;
         }
-
+        public IActionResult Index()
+        {
+            return View();
+        }
         [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult Login(string em = null, string pwd = null)
@@ -35,18 +38,21 @@ namespace CoreTemp_Identity.Controllers
             HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, SysBase.cookieName, "user", "role")));
 
             /*Fake Data*/
-            List<object> _ua = new List<object>();
-            _ua.Add(new
+            List<UserAccount> _ua = new List<UserAccount>();
+            _ua.Add(new UserAccount()
             {
                 Account = "b@.gcom"
-                ,Pwd = "123456"
+                ,
+                Pwd = "123456"
             });
             ServiceProvider provider = new ServiceCollection()
                                    .AddSingleton<IDBManage, DBAction>()
                                    .AddSingleton<DBm>()
                                    .BuildServiceProvider();
-            
-            provider.GetService<DBm>().Use<DBAction>(o => o.UpdateData(_ua));
+
+            provider.GetService<DBm>().Use<DBAction>(o => o.CreateData(_ua));
+
+
             /***/
 
             return Redirect("/Home/About");
