@@ -8,6 +8,9 @@ using CoreTemp_Identity.Models;
 using System.Security.Claims;
 using CoreTemp_Identity.Models.SYSTEM;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
+using static CoreTemp_Identity.Controllers.Services.Services;
 
 namespace CoreTemp_Identity.Controllers
 {
@@ -19,10 +22,6 @@ namespace CoreTemp_Identity.Controllers
             this.db = _db;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
         [ValidateAntiForgeryToken]
         [HttpPost]
         public IActionResult Login(string em = null, string pwd = null)
@@ -35,21 +34,30 @@ namespace CoreTemp_Identity.Controllers
 
             HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, SysBase.cookieName, "user", "role")));
 
+            /*Fake Data*/
+            List<object> _ua = new List<object>();
+            _ua.Add(new
+            {
+                Account = "b@.gcom"
+                ,Pwd = "123456"
+            });
+            ServiceProvider provider = new ServiceCollection()
+                                   .AddSingleton<IDBManage, DBAction>()
+                                   .AddSingleton<DBm>()
+                                   .BuildServiceProvider();
+            
+            provider.GetService<DBm>().Use<DBAction>(o => o.UpdateData(_ua));
+            /***/
+
             return Redirect("/Home/About");
         }
 
-
+        
+        [Authorize]
         public IActionResult About()
         {
             var x = User.Identity.IsAuthenticated;
             ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
 
             return View();
         }
