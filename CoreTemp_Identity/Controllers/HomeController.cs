@@ -16,11 +16,6 @@ namespace CoreTemp_Identity.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly CoreContext db;
-        public HomeController(CoreContext _db)
-        {
-            this.db = _db;
-        }
         public IActionResult Index()
         {
             return View();
@@ -36,24 +31,6 @@ namespace CoreTemp_Identity.Controllers
                 };
 
             HttpContext.SignInAsync(new ClaimsPrincipal(new ClaimsIdentity(claims, SysBase.cookieName, "user", "role")));
-
-            /*Fake Data*/
-            List<UserAccount> _ua = new List<UserAccount>();
-            _ua.Add(new UserAccount()
-            {
-                Account = "b@.gcom"
-                ,
-                Pwd = "123456"
-            });
-            ServiceProvider provider = new ServiceCollection()
-                                   .AddSingleton<IDBManage, DBAction>()
-                                   .AddSingleton<DBm>()
-                                   .BuildServiceProvider();
-
-            provider.GetService<DBm>().Use<DBAction>(o => o.CreateData(_ua));
-
-
-            /***/
 
             return Redirect("/Home/About");
         }
